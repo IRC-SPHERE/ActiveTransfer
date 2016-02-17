@@ -1,0 +1,3 @@
+[submodule "Python-Plotter"]
+	path = Python-Plotter
+	url = https://github.com/SPHERE-ML/Python-Plotter.git

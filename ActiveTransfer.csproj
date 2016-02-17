@@ -1,0 +1,104 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProjectGuid>{60B18C1E-ACDE-4094-98F8-1D717B8C5B85}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>ActiveTransfer</RootNamespace>
+    <AssemblyName>ActiveTransfer</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <ConsolePause>false</ConsolePause>
+    <CustomCommands>
+      <CustomCommands>
+        <Command type="AfterBuild" command="cp -R ${TargetDir}/ /Users/td6301/beast/ActiveTransfer" />
+      </CustomCommands>
+    </CustomCommands>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Externalconsole>true</Externalconsole>
+    <PlatformTarget>x86</PlatformTarget>
+    <CustomCommands>
+      <CustomCommands>
+        <Command type="AfterBuild" command="cp -R ${TargetDir}/ /Users/td6301/beast/ActiveTransfer" />
+      </CustomCommands>
+    </CustomCommands>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Infer.Compiler">
+      <HintPath>packages\SphereEngine.0.0.2\lib\net45\Infer.Compiler.dll</HintPath>
+    </Reference>
+    <Reference Include="Infer.Runtime">
+      <HintPath>packages\SphereEngine.0.0.2\lib\net45\Infer.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="MathNet.Numerics">
+      <HintPath>packages\SphereEngine.0.0.2\lib\net45\MathNet.Numerics.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.GLEE.All">
+      <HintPath>packages\SphereEngine.0.0.2\lib\net45\Microsoft.GLEE.All.dll</HintPath>
+    </Reference>
+    <Reference Include="MongoDB.Bson">
+      <HintPath>packages\SphereEngine.0.0.2\lib\net45\MongoDB.Bson.dll</HintPath>
+    </Reference>
+    <Reference Include="MongoDB.Driver.Core">
+      <HintPath>packages\SphereEngine.0.0.2\lib\net45\MongoDB.Driver.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="MongoDB.Driver.Legacy">
+      <HintPath>packages\SphereEngine.0.0.2\lib\net45\MongoDB.Driver.Legacy.dll</HintPath>
+    </Reference>
+    <Reference Include="MongoDB.Driver">
+      <HintPath>packages\SphereEngine.0.0.2\lib\net45\MongoDB.Driver.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>packages\SphereEngine.0.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="PythonPlotter">
+      <HintPath>packages\SphereEngine.0.0.2\lib\net45\PythonPlotter.dll</HintPath>
+    </Reference>
+    <Reference Include="SphereEngine">
+      <HintPath>packages\SphereEngine.0.0.2\lib\net45\SphereEngine.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ActiveEvidence.cs" />
+    <Compile Include="DataLoader.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="BinaryModel.cs" />
+    <Compile Include="MultiClassModel.cs" />
+    <Compile Include="Metrics.cs" />
+    <Compile Include="Experiment.cs" />
+    <Compile Include="MetricsCollection.cs" />
+    <Compile Include="RealDataRunner.cs" />
+    <Compile Include="ToyData.cs" />
+    <Compile Include="DataSet.cs" />
+    <Compile Include="ActiveLearner.cs" />
+    <Compile Include="Marginals.cs" />
+    <Compile Include="HoldoutMetricsCollection.cs" />
+    <Compile Include="ToyDataRunner.cs" />
+    <Compile Include="Utils.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+</Project>
