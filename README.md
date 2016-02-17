@@ -1,2 +1,2 @@
-# Active-Transfer
+# ActiveTransfer
 Bayesian Active Transfer Learning
