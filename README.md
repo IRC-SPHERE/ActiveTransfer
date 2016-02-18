@@ -3,11 +3,12 @@ Bayesian Active Transfer Learning
 
 Code accompanying the paper:
 
-@inproceedings{diethe2016active,
-	Author = {Tom Diethe and Niall Twomey and Peter Flach},
-	Booktitle = {24th European Symposium on Artificial Neural Networks, {ESANN} 2016, Bruges, Belgium, April 27-29, 2016},
-	Title = {Active transfer learning for activity recognition},
-	Year = {2016}}
+    @inproceedings{diethe2016active,
+    	Author = {Tom Diethe and Niall Twomey and Peter Flach},
+    	Booktitle = {24th European Symposium on Artificial Neural Networks, {ESANN} 2016, Bruges, Belgium, April 27-29, 2016},
+    	Title = {Active transfer learning for activity recognition},
+    	Year = {2016}
+    	}
 
 
 ## Active transfer learning for activity recognition
