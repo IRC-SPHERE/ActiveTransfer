@@ -6,8 +6,6 @@ Code accompanying the paper:
 @inproceedings{diethe2016active,
 	Author = {Tom Diethe and Niall Twomey and Peter Flach},
 	Booktitle = {24th European Symposium on Artificial Neural Networks, {ESANN} 2016, Bruges, Belgium, April 27-29, 2016},
-	Date-Added = {2016-02-18 14:20:07 +0000},
-	Date-Modified = {2016-02-18 14:23:00 +0000},
 	Title = {Active transfer learning for activity recognition},
 	Year = {2016}}
 
