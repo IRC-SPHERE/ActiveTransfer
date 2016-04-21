@@ -23,102 +23,102 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using SphereEngine;
 
 namespace ActiveTransfer
 {
-	/// <summary>
-	/// Metrics collection.
-	/// </summary>
-	public class MetricsCollection
-	{
-		/// <summary>
-		/// The metrics.
-		/// </summary>
-		private readonly IList<Metrics> metrics = new List<Metrics>();
+    using System.Collections.Generic;
+    using System.Linq;
+    using SphereEngine;
 
-		/// <summary>
-		/// Add the specified metrics.
-		/// </summary>
-		/// <param name="metrics">Metrics.</param>
-		/// <param name="printSummary">If set to <c>true</c> print summary.</param>
-		public void Add(Metrics metrics, bool printSummary = false)
-		{
-			this.metrics.Add(metrics);
-			if (printSummary)
-			{
-				metrics.PrintSummary();
-			}
-		}
-        
+    /// <summary>
+    /// Metrics collection.
+    /// </summary>
+    public class MetricsCollection
+    {
+        /// <summary>
+        /// The metrics.
+        /// </summary>
+        private readonly IList<Metrics> metrics = new List<Metrics>();
+
+        /// <summary>
+        /// Add the specified metrics.
+        /// </summary>
+        /// <param name="metrics">Metrics.</param>
+        /// <param name="printSummary">If set to <c>true</c> print summary.</param>
+        public void Add(Metrics metrics, bool printSummary = false)
+        {
+            this.metrics.Add(metrics);
+            if (printSummary)
+            {
+                metrics.PrintSummary();
+            }
+        }
+
         /// <summary>
         /// Gets the minimum length
         /// </summary>
         public int MinimumLength { get { return metrics.Min(ia => ia.Predictions.Length); } }
 
-		/// <summary>
-		/// Gets or sets the average log prob.
-		/// </summary>
-		/// <value>The average log prob.</value>
-		public IList<double> AverageLogProb { get; set; }
+        /// <summary>
+        /// Gets or sets the average log prob.
+        /// </summary>
+        /// <value>The average log prob.</value>
+        public IList<double> AverageLogProb { get; set; }
 
-		/// <summary>
-		/// Gets or sets the std dev log prob.
-		/// </summary>
-		/// <value>The std dev log prob.</value>
-		public IList<double> StdDevLogProb { get; set; }
+        /// <summary>
+        /// Gets or sets the std dev log prob.
+        /// </summary>
+        /// <value>The std dev log prob.</value>
+        public IList<double> StdDevLogProb { get; set; }
 
-		/// <summary>
-		/// Gets or sets the average accuracy.
-		/// </summary>
-		/// <value>The average accuracy.</value>
-		public IList<double> AverageAccuracy { get; set; }
+        /// <summary>
+        /// Gets or sets the average accuracy.
+        /// </summary>
+        /// <value>The average accuracy.</value>
+        public IList<double> AverageAccuracy { get; set; }
 
-		/// <summary>
-		/// Gets or sets the std dev accuracy.
-		/// </summary>
-		/// <value>The std dev accuracy.</value>
-		public IList<double> StdDevAccuracy { get; set; }
+        /// <summary>
+        /// Gets or sets the std dev accuracy.
+        /// </summary>
+        /// <value>The std dev accuracy.</value>
+        public IList<double> StdDevAccuracy { get; set; }
 
-		/// <summary>
-		/// Gets or sets the average brier score.
-		/// </summary>
-		/// <value>The average brier score.</value>
-		public IList<double> AverageBrierScore { get; set; }
+        /// <summary>
+        /// Gets or sets the average brier score.
+        /// </summary>
+        /// <value>The average brier score.</value>
+        public IList<double> AverageBrierScore { get; set; }
 
-		/// <summary>
-		/// Gets or sets the std dev brier score.
-		/// </summary>
-		/// <value>The std dev brier score.</value>
-		public IList<double> StdDevBrierScore { get; set; } 
+        /// <summary>
+        /// Gets or sets the std dev brier score.
+        /// </summary>
+        /// <value>The std dev brier score.</value>
+        public IList<double> StdDevBrierScore { get; set; }
 
-		/// <summary>
-		/// Recomputes the aggregate metrics.
-		/// </summary>
-		public void RecomputeAggregateMetrics()
-		{
-			int numberOfInstances = metrics.Min(ia => ia.Predictions.Length);
+        /// <summary>
+        /// Recomputes the aggregate metrics.
+        /// </summary>
+        public void RecomputeAggregateMetrics()
+        {
+            int numberOfInstances = metrics.Min(ia => ia.Predictions.Length);
 
-			AverageLogProb = new double[numberOfInstances];
-			StdDevLogProb = new double[numberOfInstances];
-			AverageAccuracy = new double[numberOfInstances];
-			StdDevAccuracy = new double[numberOfInstances];
-			AverageBrierScore = new double[numberOfInstances];
-			StdDevBrierScore = new double[numberOfInstances];
+            AverageLogProb = new double[numberOfInstances];
+            StdDevLogProb = new double[numberOfInstances];
+            AverageAccuracy = new double[numberOfInstances];
+            StdDevAccuracy = new double[numberOfInstances];
+            AverageBrierScore = new double[numberOfInstances];
+            StdDevBrierScore = new double[numberOfInstances];
 
-			for (int i = 0; i < numberOfInstances; i++)
-			{
-				AverageLogProb[i] = metrics.Average(ia => ia.CumulativeLogProbOfTruth[i]);
-				StdDevLogProb[i] = metrics.StandardDeviation(ia => ia.CumulativeLogProbOfTruth[i]);
-				AverageAccuracy[i] = metrics.Average(ia => ia.CumulativeAccuracy[i]);
-				StdDevAccuracy[i] = metrics.StandardDeviation(ia => ia.CumulativeAccuracy[i]);
-				AverageBrierScore[i] = metrics.Average(ia => ia.CumulativeBrierScore[i]);
-				StdDevBrierScore[i] = metrics.StandardDeviation(ia => ia.CumulativeBrierScore[i]);
-			}
-		}
-	}
+            for (int i = 0; i < numberOfInstances; i++)
+            {
+                AverageLogProb[i] = metrics.Average(ia => ia.CumulativeLogProbOfTruth[i]);
+                StdDevLogProb[i] = metrics.StandardDeviation(ia => ia.CumulativeLogProbOfTruth[i]);
+                AverageAccuracy[i] = metrics.Average(ia => ia.CumulativeAccuracy[i]);
+                StdDevAccuracy[i] = metrics.StandardDeviation(ia => ia.CumulativeAccuracy[i]);
+                AverageBrierScore[i] = metrics.Average(ia => ia.CumulativeBrierScore[i]);
+                StdDevBrierScore[i] = metrics.StandardDeviation(ia => ia.CumulativeBrierScore[i]);
+            }
+        }
+    }
 }
 

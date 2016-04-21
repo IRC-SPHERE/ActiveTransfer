@@ -26,198 +26,198 @@
 
 namespace ActiveTransfer
 {
-	using System;
-	using System.Linq;
-	using MicrosoftResearch.Infer.Distributions;
-	using MicrosoftResearch.Infer.Maths;
-	using SphereEngine;
-	using GammaArray = MicrosoftResearch.Infer.Distributions.DistributionStructArray<MicrosoftResearch.Infer.Distributions.Gamma, double>;
-	using GaussianArray = MicrosoftResearch.Infer.Distributions.DistributionStructArray<MicrosoftResearch.Infer.Distributions.Gaussian, double>;
+    using System;
+    using System.Linq;
+    using MicrosoftResearch.Infer.Distributions;
+    using MicrosoftResearch.Infer.Maths;
+    using SphereEngine;
+    using GammaArray = MicrosoftResearch.Infer.Distributions.DistributionStructArray<MicrosoftResearch.Infer.Distributions.Gamma, double>;
+    using GaussianArray = MicrosoftResearch.Infer.Distributions.DistributionStructArray<MicrosoftResearch.Infer.Distributions.Gaussian, double>;
 
-	/// <summary>
-	/// Toy data.
-	/// </summary>
-	public class ToyData
-	{
-		/// <summary>
-		/// The prior weight means.
-		/// </summary>
-		private GaussianArray priorWeightMeans;
+    /// <summary>
+    /// Toy data.
+    /// </summary>
+    public class ToyData
+    {
+        /// <summary>
+        /// The prior weight means.
+        /// </summary>
+        private GaussianArray priorWeightMeans;
 
-		/// <summary>
-		/// The prior weight precisions.
-		/// </summary>
-		private GammaArray priorWeightPrecisions;
+        /// <summary>
+        /// The prior weight precisions.
+        /// </summary>
+        private GammaArray priorWeightPrecisions;
 
-		/// <summary>
-		/// Gets or sets the number of residents.
-		/// </summary>
-		/// <value>The number of residents.</value>
-		public int NumberOfResidents { get; set; }
+        /// <summary>
+        /// Gets or sets the number of residents.
+        /// </summary>
+        /// <value>The number of residents.</value>
+        public int NumberOfResidents { get; set; }
 
-		/// <summary>
-		/// Gets or sets the number of features.
-		/// </summary>
-		/// <value>The number of features.</value>
-		public int NumberOfFeatures { get; set; }
+        /// <summary>
+        /// Gets or sets the number of features.
+        /// </summary>
+        /// <value>The number of features.</value>
+        public int NumberOfFeatures { get; set; }
 
-		/// <summary>
-		/// Gets or sets the number of activities.
-		/// </summary>
-		/// <value>The number of activities.</value>
-		public int NumberOfActivities { get; set; }
+        /// <summary>
+        /// Gets or sets the number of activities.
+        /// </summary>
+        /// <value>The number of activities.</value>
+        public int NumberOfActivities { get; set; }
 
-		/// <summary>
-		/// Gets or sets a value indicating whether this <see cref="ActiveTransfer.ToyData"/> use bias.
-		/// </summary>
-		/// <value><c>true</c> if use bias; otherwise, <c>false</c>.</value>
-		public bool UseBias { get; set; }
+        /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="ActiveTransfer.ToyData"/> use bias.
+        /// </summary>
+        /// <value><c>true</c> if use bias; otherwise, <c>false</c>.</value>
+        public bool UseBias { get; set; }
 
-		/// <summary>
-		/// Gets or sets the true prior mean.
-		/// </summary>
-		/// <value>The true prior mean.</value>
-		public Gaussian TruePriorMean { get; set; }
+        /// <summary>
+        /// Gets or sets the true prior mean.
+        /// </summary>
+        /// <value>The true prior mean.</value>
+        public Gaussian TruePriorMean { get; set; }
 
-		/// <summary>
-		/// Gets or sets the true prior precision.
-		/// </summary>
-		/// <value>The true prior precision.</value>
-		public Gamma TruePriorPrecision { get; set; }
+        /// <summary>
+        /// Gets or sets the true prior precision.
+        /// </summary>
+        /// <value>The true prior precision.</value>
+        public Gamma TruePriorPrecision { get; set; }
 
-		/// <summary>
-		/// Gets the prior weight means.
-		/// </summary>
-		/// <value>The prior weight means.</value>
-		public GaussianArray PriorWeightMeans { get { return priorWeightMeans ?? (priorWeightMeans = DistributionArrayHelpers.CreateGaussianArray(NumberOfFeatures + (UseBias ? 1 : 0), 0, 1)); } }
+        /// <summary>
+        /// Gets the prior weight means.
+        /// </summary>
+        /// <value>The prior weight means.</value>
+        public GaussianArray PriorWeightMeans { get { return priorWeightMeans ?? (priorWeightMeans = DistributionArrayHelpers.CreateGaussianArray(NumberOfFeatures + (UseBias ? 1 : 0), 0, 1)); } }
 
-		/// <summary>
-		/// Gets the prior weight precisions.
-		/// </summary>
-		/// <value>The prior weight precisions.</value>
-		public GammaArray PriorWeightPrecisions { get { return priorWeightPrecisions ?? (priorWeightPrecisions = DistributionArrayHelpers.CreateGammaArray(NumberOfFeatures + (UseBias ? 1 : 0), 1, 1)); } }
+        /// <summary>
+        /// Gets the prior weight precisions.
+        /// </summary>
+        /// <value>The prior weight precisions.</value>
+        public GammaArray PriorWeightPrecisions { get { return priorWeightPrecisions ?? (priorWeightPrecisions = DistributionArrayHelpers.CreateGammaArray(NumberOfFeatures + (UseBias ? 1 : 0), 1, 1)); } }
 
-		/// <summary>
-		/// Gets or sets the community weights.
-		/// </summary>
-		/// <value>The community weights.</value>
-		public Gaussian[] CommunityWeights { get; set; }
+        /// <summary>
+        /// Gets or sets the community weights.
+        /// </summary>
+        /// <value>The community weights.</value>
+        public Gaussian[] CommunityWeights { get; set; }
 
-		/// <summary>
-		/// Gets or sets the weights.
-		/// </summary>
-		/// <value>The weights.</value>
-		public double[][] Weights { get; set; }
+        /// <summary>
+        /// Gets or sets the weights.
+        /// </summary>
+        /// <value>The weights.</value>
+        public double[][] Weights { get; set; }
 
-		/// <summary>
-		/// Gets or sets the data set.
-		/// </summary>
-		/// <value>The data set.</value>
-		public DataSet DataSet { get; set; }
+        /// <summary>
+        /// Gets or sets the data set.
+        /// </summary>
+        /// <value>The data set.</value>
+        public DataSet DataSet { get; set; }
 
-		/// <summary>
-		/// Gets or sets the holdout set.
-		/// </summary>
-		/// <value>The holdout set.</value>
-		public DataSet HoldoutSet { get; set; }
+        /// <summary>
+        /// Gets or sets the holdout set.
+        /// </summary>
+        /// <value>The holdout set.</value>
+        public DataSet HoldoutSet { get; set; }
 
-		/// <summary>
-		/// Computes the weights.
-		/// </summary>
-		public void ComputeWeights()
-		{
-			if (NumberOfActivities != 2)
-			{
-				throw new InvalidOperationException("This version of the function is for binary data only");
-			}
+        /// <summary>
+        /// Computes the weights.
+        /// </summary>
+        public void ComputeWeights()
+        {
+            if (NumberOfActivities != 2)
+            {
+                throw new InvalidOperationException("This version of the function is for binary data only");
+            }
 
-			Weights = new double[NumberOfResidents][];
-			int numFeaturesIncludingBias = NumberOfFeatures + (UseBias ? 1 : 0);
+            Weights = new double[NumberOfResidents][];
+            int numFeaturesIncludingBias = NumberOfFeatures + (UseBias ? 1 : 0);
 
-			CommunityWeights = new Gaussian[numFeaturesIncludingBias];
-			for (int i = 0; i < numFeaturesIncludingBias; i++)
-			{
-				CommunityWeights[i] = new Gaussian(TruePriorMean.Sample(), TruePriorPrecision.Sample());
-			}
+            CommunityWeights = new Gaussian[numFeaturesIncludingBias];
+            for (int i = 0; i < numFeaturesIncludingBias; i++)
+            {
+                CommunityWeights[i] = new Gaussian(TruePriorMean.Sample(), TruePriorPrecision.Sample());
+            }
 
 
-			for (int i = 0; i < NumberOfResidents; i++)
-			{
-				Weights[i] = new double[numFeaturesIncludingBias];
+            for (int i = 0; i < NumberOfResidents; i++)
+            {
+                Weights[i] = new double[numFeaturesIncludingBias];
 
-				// Generate weight per feature, and then sample from that per user, for this to match the model
-				for (int j = 0; j < numFeaturesIncludingBias; j++)
-				{
-					Weights[i][j] = CommunityWeights[j].Sample();
-				}
-			}
-		}
+                // Generate weight per feature, and then sample from that per user, for this to match the model
+                for (int j = 0; j < numFeaturesIncludingBias; j++)
+                {
+                    Weights[i][j] = CommunityWeights[j].Sample();
+                }
+            }
+        }
 
-		/// <summary>
-		/// Generate the data using the specified noisy example proportion.
-		/// </summary>
-		/// <param name="noisyExampleProportion">Noisy example proportion.</param>
-		/// <param name="holdout">If set to <c>true</c> holdout.</param>
-		public void Generate(double noisyExampleProportion, int numberOfInstances, bool holdout = false)
-		{
-			if (NumberOfActivities != 2)
-			{
-				throw new InvalidOperationException("This version of the function is for binary data only");
-			}
+        /// <summary>
+        /// Generate the data using the specified noisy example proportion.
+        /// </summary>
+        /// <param name="noisyExampleProportion">Noisy example proportion.</param>
+        /// <param name="holdout">If set to <c>true</c> holdout.</param>
+        public void Generate(double noisyExampleProportion, int numberOfInstances, bool holdout = false)
+        {
+            if (NumberOfActivities != 2)
+            {
+                throw new InvalidOperationException("This version of the function is for binary data only");
+            }
 
-			if (numberOfInstances == 0)
-			{
-				return;
-			}
+            if (numberOfInstances == 0)
+            {
+                return;
+            }
 
-			if (Weights == null)
-			{
-				ComputeWeights();
-			}
+            if (Weights == null)
+            {
+                ComputeWeights();
+            }
 
-			// int numberOfInstances = holdout ? NumberOfHoldoutInstances : NumberOfInstances;
+            // int numberOfInstances = holdout ? NumberOfHoldoutInstances : NumberOfInstances;
 
-			var scores = new double[NumberOfResidents][];
-			var features = new double[NumberOfResidents][][];
-			var labels = new bool[NumberOfResidents][];
-			int numFeaturesIncludingBias = NumberOfFeatures + (UseBias ? 1 : 0);
+            var scores = new double[NumberOfResidents][];
+            var features = new double[NumberOfResidents][][];
+            var labels = new bool[NumberOfResidents][];
+            int numFeaturesIncludingBias = NumberOfFeatures + (UseBias ? 1 : 0);
 
-			for (int i = 0; i < NumberOfResidents; i++)
-			{
-				features[i] = new double[numberOfInstances][];
-				scores[i] = new double[numberOfInstances];
-				labels[i] = new bool[numberOfInstances];
+            for (int i = 0; i < NumberOfResidents; i++)
+            {
+                features[i] = new double[numberOfInstances][];
+                scores[i] = new double[numberOfInstances];
+                labels[i] = new bool[numberOfInstances];
 
-				// Generate weight per feature, and then sample from that per user, for this to match the model
-				for (int j = 0; j < numberOfInstances; j++)
-				{
-					bool noisyExample = Rand.Double() > noisyExampleProportion;
-					features[i][j] = new double[numFeaturesIncludingBias];
+                // Generate weight per feature, and then sample from that per user, for this to match the model
+                for (int j = 0; j < numberOfInstances; j++)
+                {
+                    bool noisyExample = Rand.Double() > noisyExampleProportion;
+                    features[i][j] = new double[numFeaturesIncludingBias];
 
-					var products = new double[numFeaturesIncludingBias];
-					for (int k = 0; k < numFeaturesIncludingBias; k++)
-					{
-						// double feature = Rand.Double() > noisyExampleProportion ? (double)Rand.Int(2) - 0.5 : 0.0; // Rand.Double() - 0.5 : 0.0;
-						double feature = noisyExample ? Rand.Double() - 0.5 : 0.0; // (double)Rand.Int(2);
-						features[i][j][k] = (k == NumberOfFeatures) ? -1 : feature;
-						products[k] = Weights[i][k] * features[i][j][k];
-					}
+                    var products = new double[numFeaturesIncludingBias];
+                    for (int k = 0; k < numFeaturesIncludingBias; k++)
+                    {
+                        // double feature = Rand.Double() > noisyExampleProportion ? (double)Rand.Int(2) - 0.5 : 0.0; // Rand.Double() - 0.5 : 0.0;
+                        double feature = noisyExample ? Rand.Double() - 0.5 : 0.0; // (double)Rand.Int(2);
+                        features[i][j][k] = (k == NumberOfFeatures) ? -1 : feature;
+                        products[k] = Weights[i][k] * features[i][j][k];
+                    }
 
-					scores[i][j] = new Gaussian(products.Sum(), 1).Sample();
+                    scores[i][j] = new Gaussian(products.Sum(), 1).Sample();
 
-					labels[i][j] = scores[i][j] > 0;
-				}
-			}
+                    labels[i][j] = scores[i][j] > 0;
+                }
+            }
 
-			if (holdout)
-			{
-				HoldoutSet = new DataSet { Features = features, Labels = labels };
-			}
-			else
-			{
-				DataSet = new DataSet { Features = features, Labels = labels };
-			}
-		}
-	}
+            if (holdout)
+            {
+                HoldoutSet = new DataSet { Features = features, Labels = labels };
+            }
+            else
+            {
+                DataSet = new DataSet { Features = features, Labels = labels };
+            }
+        }
+    }
 }
 

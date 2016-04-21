@@ -26,98 +26,97 @@
 
 namespace ActiveTransfer
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Linq;
-	using MicrosoftResearch.Infer.Distributions;
-	using SphereEngine;
+    using System;
+    using System.Collections.Generic;
+    using MicrosoftResearch.Infer.Distributions;
+    using SphereEngine;
 
-	public static class ToyDataRunner
-	{
+    public static class ToyDataRunner
+    {
         const int ActiveSteps = 50;
         const double NoisyExampleProportion = 0.9;
         const int NumberOfFeatures = 10;
-        
-		/// <summary>
-		/// Initializes a new instance of the <see cref="ActiveTransfer.ToyDataRunner"/> class.
-		/// </summary>
-		/// <param name="trainModel">Train model.</param>
-		/// <param name="testModel">Test model.</param>
-		public static void Run(BinaryModel trainModel, BinaryModel testModel, bool testTransfer, bool testActive, bool testActiveTransfer)
-		{
-			var phase1PriorMean = new Gaussian(4, 1);
-			var phase1PriorPrecision = new Gamma(1, 1);
-			var phase2PriorMean = new Gaussian(4, 1);
-			var phase2PriorPrecision = new Gamma(1, 1);
-			
-			// Generate data for 5 individuals
-			var data = new List<ToyData>();
-			for (int i = 0; i < 3; i++)
-			{
-				var toy = new ToyData
-					{ 
-						// NumberOfInstances = 200,
-						// NumberOfHoldoutInstances = i == 0 ? 0 : 1000,
-						NumberOfResidents = 5,
-						NumberOfFeatures = NumberOfFeatures,
-						NumberOfActivities = 2,
-						UseBias = false,
-						TruePriorMean = i == 0 ? phase1PriorMean : phase2PriorMean,
-						TruePriorPrecision = i == 0 ? phase1PriorPrecision : phase2PriorPrecision
-					};	
 
-				toy.Generate(i == 2 ? NoisyExampleProportion : 0.0, 200);
-				if (i != 0)
-				{
-					// no need for holdout data in training set
-					toy.Generate(0.0, 1000, true);
-				}
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ToyDataRunner"/> class.
+        /// </summary>
+        /// <param name="trainModel">Train model.</param>
+        /// <param name="testModel">Test model.</param>
+        public static void Run(BinaryModel trainModel, BinaryModel testModel, bool testTransfer, bool testActive, bool testActiveTransfer)
+        {
+            var phase1PriorMean = new Gaussian(4, 1);
+            var phase1PriorPrecision = new Gamma(1, 1);
+            var phase2PriorMean = new Gaussian(4, 1);
+            var phase2PriorPrecision = new Gamma(1, 1);
 
-				data.Add(toy);
-			}
+            // Generate data for 5 individuals
+            var data = new List<ToyData>();
+            for (int i = 0; i < 3; i++)
+            {
+                var toy = new ToyData
+                {
+                    // NumberOfInstances = 200,
+                    // NumberOfHoldoutInstances = i == 0 ? 0 : 1000,
+                    NumberOfResidents = 5,
+                    NumberOfFeatures = NumberOfFeatures,
+                    NumberOfActivities = 2,
+                    UseBias = false,
+                    TruePriorMean = i == 0 ? phase1PriorMean : phase2PriorMean,
+                    TruePriorPrecision = i == 0 ? phase1PriorPrecision : phase2PriorPrecision
+                };
 
-			var priors = new Marginals
-				{
-					WeightMeans = DistributionArrayHelpers.CreateGaussianArray(NumberOfFeatures, 0, 1).ToArray(),
-					WeightPrecisions = DistributionArrayHelpers.CreateGammaArray(NumberOfFeatures, 1, 1).ToArray()
-				};
+                toy.Generate(i == 2 ? NoisyExampleProportion : 0.0, 200);
+                if (i != 0)
+                {
+                    // no need for holdout data in training set
+                    toy.Generate(0.0, 1000, true);
+                }
 
-			Console.WriteLine("Data Generated");
+                data.Add(toy);
+            }
 
-			// TODO: Create meta-features that allow us to do the first form of transfer learning
+            var priors = new Marginals
+            {
+                WeightMeans = DistributionArrayHelpers.CreateGaussianArray(NumberOfFeatures, 0, 1).ToArray(),
+                WeightPrecisions = DistributionArrayHelpers.CreateGammaArray(NumberOfFeatures, 1, 1).ToArray()
+            };
 
-			// Train the community model
-			Console.WriteLine("Training Community Model");
-			var communityExperiment = new Experiment { TrainModel = trainModel, TestModel = testModel, Name = "Community" };
-			communityExperiment.RunBatch(data[0].DataSet, priors);
-			// PrintWeightPriors(communityExperiment.Posteriors, trainData.CommunityWeights);
+            Console.WriteLine("Data Generated");
 
-			// Utils.PlotPosteriors(communityExperiment.Posteriors.Weights, data[0].Weights);
-			// Utils.PlotPosteriors(communityExperiment.Posteriors.WeightMeans, communityExperiment.Posteriors.WeightPrecisions, null, "Community weights", "Feature");
+            // TODO: Create meta-features that allow us to do the first form of transfer learning
 
-			// return;
+            // Train the community model
+            Console.WriteLine("Training Community Model");
+            var communityExperiment = new Experiment { TrainModel = trainModel, TestModel = testModel, Name = "Community" };
+            communityExperiment.RunBatch(data[0].DataSet, priors);
+            // PrintWeightPriors(communityExperiment.Posteriors, trainData.CommunityWeights);
 
-			if (testTransfer)
-			{
-				// Do online learning
-				// Console.WriteLine("Testing Online Model");
-				var onlineExperiment = new Experiment { TrainModel = trainModel, TestModel = testModel, Name = "Online" };
-				onlineExperiment.RunOnline(data[1].DataSet, data[1].HoldoutSet, priors);
+            // Utils.PlotPosteriors(communityExperiment.Posteriors.Weights, data[0].Weights);
+            // Utils.PlotPosteriors(communityExperiment.Posteriors.WeightMeans, communityExperiment.Posteriors.WeightPrecisions, null, "Community weights", "Feature");
 
-				// Do transfer learning
-				// Console.WriteLine("Testing Community Model");
-				var personalisationExperiment = new Experiment { TrainModel = trainModel, TestModel = testModel, Name = "Community" };
-				personalisationExperiment.RunOnline(data[1].DataSet, data[1].HoldoutSet, communityExperiment.Posteriors);
+            // return;
 
-				// Plot cumulative metrics
-				Utils.PlotCumulativeMetrics(new[] { onlineExperiment, personalisationExperiment }, "Toy Transfer");
-			}
+            if (testTransfer)
+            {
+                // Do online learning
+                // Console.WriteLine("Testing Online Model");
+                var onlineExperiment = new Experiment { TrainModel = trainModel, TestModel = testModel, Name = "Online" };
+                onlineExperiment.RunOnline(data[1].DataSet, data[1].HoldoutSet, priors);
+
+                // Do transfer learning
+                // Console.WriteLine("Testing Community Model");
+                var personalisationExperiment = new Experiment { TrainModel = trainModel, TestModel = testModel, Name = "Community" };
+                personalisationExperiment.RunOnline(data[1].DataSet, data[1].HoldoutSet, communityExperiment.Posteriors);
+
+                // Plot cumulative metrics
+                Utils.PlotCumulativeMetrics(new[] { onlineExperiment, personalisationExperiment }, "Toy Transfer");
+            }
             else
             {
                 Console.WriteLine("Skipping Transfer Learning");
             }
 
-			// ACTIVE MODEL
+            // ACTIVE MODEL
             if (testActive)
             {
                 ActiveTransfer(trainModel, testModel, data, "Toy Active", priors);
@@ -132,21 +131,20 @@ namespace ActiveTransfer
                 Console.WriteLine("Note that the transfer learning is very effective here, so the active learning doesn't add much");
                 ActiveTransfer(trainModel, testModel, data, "Toy Active Transfer", communityExperiment.Posteriors);
             }
-			else
+            else
             {
                 Console.WriteLine("Skipping Active Transfer Learning");
             }
 
             // Now create different costs for acquiring labels - want to demonstrate that we choose from all 3 possible labels			
-		}
-        
+        }
+
         /// <summary>
         /// Active Transfer tests.
         /// </summary>
         /// <param name="trainModel">The train model.</param>
         /// <param name="testModel">The test model.</param>
         /// <param name="data">The datasets.</param>
-        /// <param name="doTransfer">Whether or not to do transfer learning.</param>
         public static void ActiveTransfer(BinaryModel trainModel, BinaryModel testModel, IList<ToyData> data, string title, Marginals priors)
         {
             var learners = new Dictionary<string, IList<IActiveLearner>>
@@ -157,7 +155,7 @@ namespace ActiveTransfer
                 { "VOI+", Utils.CreateLearners<ActiveLearner>(data[2].DataSet, trainModel, testModel, null) },
                 { "VOI-", Utils.CreateLearners<ActiveLearner>(data[2].DataSet, trainModel, testModel, null, true) }
             };
-                
+
             var experiments = new List<Experiment>();
 
             foreach (var learner in learners)
@@ -168,8 +166,8 @@ namespace ActiveTransfer
                 experiments.Add(experiment);
             }
 
-            Utils.PlotHoldoutMetrics(experiments, title, "", true);            
+            Utils.PlotHoldoutMetrics(experiments, title, "", true);
         }
-	}
+    }
 }
 

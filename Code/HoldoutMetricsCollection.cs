@@ -23,74 +23,77 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using SphereEngine;
 
 namespace ActiveTransfer
 {
-	public class HoldoutMetricsCollection
-	{
-		public Metrics[][] Metrics { get; set; }
+    using System.Collections.Generic;
+    using System.Linq;
+    using SphereEngine;
 
-		/// <summary>
-		/// Gets or sets the average log prob.
-		/// </summary>
-		/// <value>The average log prob.</value>
-		public IList<double> AverageLogProb { get; set; }
+    /// <summary>
+    /// Holdout metrics collection.
+    /// </summary>
+    public class HoldoutMetricsCollection
+    {
+        public Metrics[][] Metrics { get; set; }
 
-		/// <summary>
-		/// Gets or sets the std dev log prob.
-		/// </summary>
-		/// <value>The std dev log prob.</value>
-		public IList<double> StdDevLogProb { get; set; }
+        /// <summary>
+        /// Gets or sets the average log prob.
+        /// </summary>
+        /// <value>The average log prob.</value>
+        public IList<double> AverageLogProb { get; set; }
 
-		/// <summary>
-		/// Gets or sets the average accuracy.
-		/// </summary>
-		/// <value>The average accuracy.</value>
-		public IList<double> AverageAccuracy { get; set; }
+        /// <summary>
+        /// Gets or sets the std dev log prob.
+        /// </summary>
+        /// <value>The std dev log prob.</value>
+        public IList<double> StdDevLogProb { get; set; }
 
-		/// <summary>
-		/// Gets or sets the std dev accuracy.
-		/// </summary>
-		/// <value>The std dev accuracy.</value>
-		public IList<double> StdDevAccuracy { get; set; }
+        /// <summary>
+        /// Gets or sets the average accuracy.
+        /// </summary>
+        /// <value>The average accuracy.</value>
+        public IList<double> AverageAccuracy { get; set; }
 
-		/// <summary>
-		/// Gets or sets the average brier score.
-		/// </summary>
-		/// <value>The average brier score.</value>
-		public IList<double> AverageBrierScore { get; set; }
+        /// <summary>
+        /// Gets or sets the std dev accuracy.
+        /// </summary>
+        /// <value>The std dev accuracy.</value>
+        public IList<double> StdDevAccuracy { get; set; }
 
-		/// <summary>
-		/// Gets or sets the std dev brier score.
-		/// </summary>
-		/// <value>The std dev brier score.</value>
-		public IList<double> StdDevBrierScore { get; set; }
+        /// <summary>
+        /// Gets or sets the average brier score.
+        /// </summary>
+        /// <value>The average brier score.</value>
+        public IList<double> AverageBrierScore { get; set; }
 
-		/// <summary>
-		/// Recomputes the aggregate metrics.
-		/// </summary>
-		public void RecomputeAggregateMetrics()
-		{
-			AverageLogProb = new double[Metrics[0].Length];
-			StdDevLogProb = new double[Metrics[0].Length];
-			AverageAccuracy = new double[Metrics[0].Length];
-			StdDevAccuracy = new double[Metrics[0].Length];
+        /// <summary>
+        /// Gets or sets the std dev brier score.
+        /// </summary>
+        /// <value>The std dev brier score.</value>
+        public IList<double> StdDevBrierScore { get; set; }
 
-			var accuracies = Metrics.Select(ia => ia.Select(inner => inner.AverageAccuracy).ToArray()).ToArray();
-			var logProbs = Metrics.Select(ia => ia.Select(inner => inner.SumLogProbOfTruth).ToArray()).ToArray();
-			var brierScores = Metrics.Select(ia => ia.Select(inner => inner.BrierScore).ToArray()).ToArray();
+        /// <summary>
+        /// Recomputes the aggregate metrics.
+        /// </summary>
+        public void RecomputeAggregateMetrics()
+        {
+            AverageLogProb = new double[Metrics[0].Length];
+            StdDevLogProb = new double[Metrics[0].Length];
+            AverageAccuracy = new double[Metrics[0].Length];
+            StdDevAccuracy = new double[Metrics[0].Length];
 
-			AverageLogProb = logProbs.ColumnAverage();
-			StdDevLogProb = logProbs.ColumnStandardDeviation();
-			AverageAccuracy = accuracies.ColumnAverage();
-			StdDevAccuracy = accuracies.ColumnStandardDeviation();
-			AverageBrierScore = brierScores.ColumnAverage();
-			StdDevBrierScore = brierScores.ColumnStandardDeviation();
-		}
-	}
+            var accuracies = Metrics.Select(ia => ia.Select(inner => inner.AverageAccuracy).ToArray()).ToArray();
+            var logProbs = Metrics.Select(ia => ia.Select(inner => inner.SumLogProbOfTruth).ToArray()).ToArray();
+            var brierScores = Metrics.Select(ia => ia.Select(inner => inner.BrierScore).ToArray()).ToArray();
+
+            AverageLogProb = logProbs.ColumnAverage();
+            StdDevLogProb = logProbs.ColumnStandardDeviation();
+            AverageAccuracy = accuracies.ColumnAverage();
+            StdDevAccuracy = accuracies.ColumnStandardDeviation();
+            AverageBrierScore = brierScores.ColumnAverage();
+            StdDevBrierScore = brierScores.ColumnStandardDeviation();
+        }
+    }
 }
 

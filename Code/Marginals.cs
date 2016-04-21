@@ -26,47 +26,47 @@
 
 namespace ActiveTransfer
 {
-	using System.Linq;
-	using MicrosoftResearch.Infer.Distributions;
-	using SphereEngine;
+    using System.Linq;
+    using MicrosoftResearch.Infer.Distributions;
+    using SphereEngine;
 
-	/// <summary>
-	/// Marginals.
-	/// </summary>
-	public class Marginals
-	{
-		/// <summary>
-		/// Initializes a new instance of the <see cref="ActiveTransfer.Marginals"/> class.
-		/// </summary>
-		public Marginals()
-		{
-		}
+    /// <summary>
+    /// Marginals.
+    /// </summary>
+    public class Marginals
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Marginals"/> class.
+        /// </summary>
+        public Marginals()
+        {
+        }
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="ActiveTransfer.Marginals"/> class.
-		/// </summary>
-		/// <param name="marginals">Marginals.</param>
-		public Marginals(Marginals marginals)
-		{
-			Weights = marginals.Weights == null ? null : marginals.Weights.Select(ia => DistributionArrayHelpers.Copy(ia).ToArray()).ToArray();
-			WeightMeans = marginals.WeightMeans == null ? null : DistributionArrayHelpers.Copy(marginals.WeightMeans).ToArray();
-			WeightPrecisions = marginals.WeightPrecisions == null ? null : DistributionArrayHelpers.Copy(marginals.WeightPrecisions).ToArray();
-		}
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Marginals"/> class.
+        /// </summary>
+        /// <param name="marginals">Marginals.</param>
+        public Marginals(Marginals marginals)
+        {
+            Weights = marginals.Weights == null ? null : marginals.Weights.Select(ia => DistributionArrayHelpers.Copy(ia).ToArray()).ToArray();
+            WeightMeans = marginals.WeightMeans == null ? null : DistributionArrayHelpers.Copy(marginals.WeightMeans).ToArray();
+            WeightPrecisions = marginals.WeightPrecisions == null ? null : DistributionArrayHelpers.Copy(marginals.WeightPrecisions).ToArray();
+        }
 
-		/// <summary>
-		/// Gets or sets the weights.
-		/// </summary>
-		public Gaussian[][] Weights { get; set; } 
+        /// <summary>
+        /// Gets or sets the weights.
+        /// </summary>
+        public Gaussian[][] Weights { get; set; }
 
-		/// <summary>
-		/// Gets or sets the weight means.
-		/// </summary>
-		public Gaussian[] WeightMeans { get; set; } 
+        /// <summary>
+        /// Gets or sets the weight means.
+        /// </summary>
+        public Gaussian[] WeightMeans { get; set; }
 
-		/// <summary>
-		/// Gets or sets the weight precisions.
-		/// </summary>
-		public Gamma[] WeightPrecisions { get; set; }
-	}
+        /// <summary>
+        /// Gets or sets the weight precisions.
+        /// </summary>
+        public Gamma[] WeightPrecisions { get; set; }
+    }
 }
 

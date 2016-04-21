@@ -23,184 +23,180 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-using MicrosoftResearch.Infer.Utils;
-using SphereEngine;
 
 namespace ActiveTransfer
 {
-	using System.Collections.Generic;
-	using System.Linq;
-	using MicrosoftResearch.Infer.Distributions;
-	using MicrosoftResearch.Infer.Models;
-	using MicrosoftResearch.Infer;
+    using MicrosoftResearch.Infer.Distributions;
+    using MicrosoftResearch.Infer.Models;
+    using MicrosoftResearch.Infer;
     using SphereEngine;
 
-	using GaussianArray = MicrosoftResearch.Infer.Distributions.DistributionStructArray<MicrosoftResearch.Infer.Distributions.Gaussian, double>;
-	using GammaArray = MicrosoftResearch.Infer.Distributions.DistributionStructArray<MicrosoftResearch.Infer.Distributions.Gamma, double>;
+    using GaussianArray = MicrosoftResearch.Infer.Distributions.DistributionStructArray<MicrosoftResearch.Infer.Distributions.Gaussian, double>;
+    using GammaArray = MicrosoftResearch.Infer.Distributions.DistributionStructArray<MicrosoftResearch.Infer.Distributions.Gamma, double>;
 
-	/// <summary>
-	/// The Multiclass Model.
-	/// </summary>
-	public class MultiClassModel
-	{
-		private readonly Variable<int> numberOfExamples;
-		private readonly Variable<int> numberOfResidents;
-		private readonly Variable<int> numberOfActivities;
-		private readonly Variable<int> numberOfFeatures;
-		private readonly Variable<double> noisePrecision;
-		private readonly VariableArray<VariableArray<VariableArray<double>, double[][]>, double[][][]> featureValues;
-		private readonly Variable<GaussianArray> weightPriorMeans;
-		private readonly Variable<GammaArray> weightPriorPrecisions;
-		private readonly VariableArray<double> weightMeans;
-		private readonly VariableArray<double> weightPrecisions;
-		private readonly VariableArray<VariableArray<VariableArray<double>, double[][]>, double[][][]> weights;
-		private readonly VariableArray<VariableArray<int>, int[][]> activities;
+    /// <summary>
+    /// The Multiclass Model.
+    /// </summary>
+    public class MultiClassModel
+    {
+        private readonly Variable<int> numberOfExamples;
+        private readonly Variable<int> numberOfResidents;
+        private readonly Variable<int> numberOfActivities;
+        private readonly Variable<int> numberOfFeatures;
+        private readonly Variable<double> noisePrecision;
+        private readonly VariableArray<VariableArray<VariableArray<double>, double[][]>, double[][][]> featureValues;
+        private readonly Variable<GaussianArray> weightPriorMeans;
+        private readonly Variable<GammaArray> weightPriorPrecisions;
+        private readonly VariableArray<double> weightMeans;
+        private readonly VariableArray<double> weightPrecisions;
+        private readonly VariableArray<VariableArray<VariableArray<double>, double[][]>, double[][][]> weights;
+        private readonly VariableArray<VariableArray<int>, int[][]> activities;
 
-		private readonly InferenceEngine engine;
+        private readonly InferenceEngine engine;
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="ActiveTransfer.Model"/> class.
-		/// </summary>
-		/// <param name="trainModel">If set to <c>true</c> train model.</param>
-		/// <param name="showFactorGraph">If set to <c>true</c> show factor graph.</param>
-		/// <param name="debug">If set to <c>true</c> debug.</param>
-		public MultiClassModel(bool trainModel, bool showFactorGraph = false, bool debug = false)
-		{
-			numberOfExamples = Variable.New<int>().Named("numberOfExamples").Attrib(new DoNotInfer());
-			numberOfResidents = Variable.New<int>().Named("numberOfResidents").Attrib(new DoNotInfer());
-			numberOfActivities = Variable.New<int>().Named("numberOfActivities").Attrib(new DoNotInfer());
-			numberOfFeatures = Variable.New<int>().Named("numberOfFeatures").Attrib(new DoNotInfer());
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MultiClassModel"/> class.
+        /// </summary>
+        /// <param name="trainModel">If set to <c>true</c> train model.</param>
+        /// <param name="showFactorGraph">If set to <c>true</c> show factor graph.</param>
+        /// <param name="debug">If set to <c>true</c> debug.</param>
+        public MultiClassModel(bool trainModel, bool showFactorGraph = false, bool debug = false)
+        {
+            numberOfExamples = Variable.New<int>().Named("numberOfExamples").Attrib(new DoNotInfer());
+            numberOfResidents = Variable.New<int>().Named("numberOfResidents").Attrib(new DoNotInfer());
+            numberOfActivities = Variable.New<int>().Named("numberOfActivities").Attrib(new DoNotInfer());
+            numberOfFeatures = Variable.New<int>().Named("numberOfFeatures").Attrib(new DoNotInfer());
 
-			var resident = new Range(numberOfResidents).Named("resident");
-			var activity = new Range(numberOfActivities).Named("activity");
-			var feature = new Range(numberOfFeatures).Named("sensor");
-			var example = new Range(numberOfExamples).Named("example").Attrib(new Sequential());
+            var resident = new Range(numberOfResidents).Named("resident");
+            var activity = new Range(numberOfActivities).Named("activity");
+            var feature = new Range(numberOfFeatures).Named("sensor");
+            var example = new Range(numberOfExamples).Named("example").Attrib(new Sequential());
 
-			noisePrecision = Variable.New<double>().Named("noisePrecision").Attrib(new DoNotInfer());
+            noisePrecision = Variable.New<double>().Named("noisePrecision").Attrib(new DoNotInfer());
 
-			weightPriorMeans = Variable.New<GaussianArray>().Named("weightPriorMeans").Attrib(new DoNotInfer());
-			weightPriorPrecisions = Variable.New<GammaArray>().Named("weightPriorPrecisions").Attrib(new DoNotInfer());
+            weightPriorMeans = Variable.New<GaussianArray>().Named("weightPriorMeans").Attrib(new DoNotInfer());
+            weightPriorPrecisions = Variable.New<GammaArray>().Named("weightPriorPrecisions").Attrib(new DoNotInfer());
 
-			weightMeans = Variable.Array<double>(activity).Named("weightMeans");
-			weightPrecisions = Variable.Array<double>(activity).Named("weightPrecisions");
+            weightMeans = Variable.Array<double>(activity).Named("weightMeans");
+            weightPrecisions = Variable.Array<double>(activity).Named("weightPrecisions");
 
-			weightMeans.SetTo(Variable<double[]>.Random(weightPriorMeans));
-			weightPrecisions.SetTo(Variable<double[]>.Random(weightPriorPrecisions));
+            weightMeans.SetTo(Variable<double[]>.Random(weightPriorMeans));
+            weightPrecisions.SetTo(Variable<double[]>.Random(weightPriorPrecisions));
 
-			weights = Variable.Array(Variable.Array(Variable.Array<double>(feature), activity), resident).Named("weights");
-			weights[resident][activity][feature] = Variable.GaussianFromMeanAndPrecision(
-							weightMeans[activity], weightPrecisions[activity]).ForEach(resident, feature);
-			
-			featureValues = Variable.Array(Variable.Array(Variable.Array<double>(feature), resident), example).Named("featureValues").Attrib(new DoNotInfer());
+            weights = Variable.Array(Variable.Array(Variable.Array<double>(feature), activity), resident).Named("weights");
+            weights[resident][activity][feature] = Variable.GaussianFromMeanAndPrecision(
+                            weightMeans[activity], weightPrecisions[activity]).ForEach(resident, feature);
 
-			activities = Variable.Array(Variable.Array<int>(resident), example).Named("activities");
-			activities.SetValueRange(activity);
+            featureValues = Variable.Array(Variable.Array(Variable.Array<double>(feature), resident), example).Named("featureValues").Attrib(new DoNotInfer());
 
-			using (Variable.ForEach(resident))
-			{
-				DefineSymmetryBreaking(weights[resident], activity, feature);
+            activities = Variable.Array(Variable.Array<int>(resident), example).Named("activities");
+            activities.SetValueRange(activity);
 
-				using (Variable.ForEach(example))
-				{
-					var score = BpmUtils.ComputeClassScores(weights[resident], featureValues[example][resident], noisePrecision);
-					if (!trainModel)
-					{
-						activities[example][resident] = Variable.DiscreteUniform(activity);
-					}
+            using (Variable.ForEach(resident))
+            {
+                DefineSymmetryBreaking(weights[resident], activity, feature);
 
-					BpmUtils.ConstrainMaximum(activities[example][resident], score);
-				}
-			}
+                using (Variable.ForEach(example))
+                {
+                    var score = BpmUtils.ComputeClassScores(weights[resident], featureValues[example][resident], noisePrecision);
+                    if (!trainModel)
+                    {
+                        activities[example][resident] = Variable.DiscreteUniform(activity);
+                    }
 
-			if (trainModel)
-			{
-				activities.AddAttribute(new DoNotInfer());
-			}
+                    BpmUtils.ConstrainMaximum(activities[example][resident], score);
+                }
+            }
 
-			this.engine = new InferenceEngine
-				{
-					Algorithm = new ExpectationPropagation { DefaultNumberOfIterations = trainModel ? 10 : 1 }, 
-					ShowFactorGraph = showFactorGraph, 
-					ShowProgress = debug,
-					// BrowserMode = BrowserMode.Never, // debug ? BrowserMode.OnError : BrowserMode.Never,
-					ShowWarnings = debug
-				};
+            if (trainModel)
+            {
+                activities.AddAttribute(new DoNotInfer());
+            }
 
-			if (debug)
-			{
-				this.engine.Compiler.GenerateInMemory = false;
-				this.engine.Compiler.WriteSourceFiles = true;
-				this.engine.Compiler.IncludeDebugInformation = true;
-				this.engine.Compiler.CatchExceptions = true;
-			}
-		}
+            engine = new InferenceEngine
+            {
+                Algorithm = new ExpectationPropagation { DefaultNumberOfIterations = trainModel ? 10 : 1 },
+                ShowFactorGraph = showFactorGraph,
+                ShowProgress = debug,
+                // BrowserMode = BrowserMode.Never, // debug ? BrowserMode.OnError : BrowserMode.Never,
+                ShowWarnings = debug
+            };
 
-		/// <summary>
-		/// Defines the symmetry-breaking constraints. 
-		/// For each feature, the sum of weights is constraint to be constant over all classes.
-		/// </summary>
-		/// <param name="weights">The random variables over the weights.</param>
-		/// <param name="activity">The activity range.</param>
-		/// <param name="feature">The feature range.</param>
-		private void DefineSymmetryBreaking(VariableArray<VariableArray<double>, double[][]> weights, Range activity, Range feature)
-		{
-			var transposedWeights = Variable.Array(Variable.Array<double>(activity), feature).Named("TransposedWeights");
-			var transposedWeightSums = Variable.Array<double>(feature).Named("TransposedWeightSums");
+            if (debug)
+            {
+                engine.Compiler.GenerateInMemory = false;
+                engine.Compiler.WriteSourceFiles = true;
+                engine.Compiler.IncludeDebugInformation = true;
+                engine.Compiler.CatchExceptions = true;
+            }
+        }
 
-			// Transpose the weights
-			transposedWeights[feature][activity] = Variable.Copy(weights[activity][feature]);
+        /// <summary>
+        /// Defines the symmetry-breaking constraints. 
+        /// For each feature, the sum of weights is constraint to be constant over all classes.
+        /// </summary>
+        /// <param name="weights">The random variables over the weights.</param>
+        /// <param name="activity">The activity range.</param>
+        /// <param name="feature">The feature range.</param>
+        private void DefineSymmetryBreaking(VariableArray<VariableArray<double>, double[][]> weights, Range activity, Range feature)
+        {
+            var transposedWeights = Variable.Array(Variable.Array<double>(activity), feature).Named("TransposedWeights");
+            var transposedWeightSums = Variable.Array<double>(feature).Named("TransposedWeightSums");
 
-			// For each feature, sum the transposed weights over classes
-			transposedWeightSums[feature] = Variable.Sum(transposedWeights[feature]);
+            // Transpose the weights
+            transposedWeights[feature][activity] = Variable.Copy(weights[activity][feature]);
 
-			// Constrain all sums to be constant
-			Variable.ConstrainEqual(transposedWeightSums[feature], 0);
-		}
+            // For each feature, sum the transposed weights over classes
+            transposedWeightSums[feature] = Variable.Sum(transposedWeights[feature]);
 
-		public void SetObservedVariables(int numberOfActivities, double[][][] featureValues)
-		{
-			numberOfExamples.ObservedValue = featureValues.Length;
-			numberOfResidents.ObservedValue = featureValues[0].Length;
-			numberOfFeatures.ObservedValue = featureValues[0][0].Length;
-			this.numberOfActivities.ObservedValue = numberOfActivities;
-			noisePrecision.ObservedValue = 10;
+            // Constrain all sums to be constant
+            Variable.ConstrainEqual(transposedWeightSums[feature], 0);
+        }
 
-			this.featureValues.ObservedValue = featureValues;
-		}
+        public void SetObservedVariables(int numberOfActivities, double[][][] featureValues)
+        {
+            numberOfExamples.ObservedValue = featureValues.Length;
+            numberOfResidents.ObservedValue = featureValues[0].Length;
+            numberOfFeatures.ObservedValue = featureValues[0][0].Length;
+            this.numberOfActivities.ObservedValue = numberOfActivities;
+            noisePrecision.ObservedValue = 10;
 
-		public void Train(int numberOfActivities, double[][][] featureValues, int[][] labels, 
-			out Gaussian[][][] posteriorWeights, out Gaussian[] posteriorWeightMeans, out Gamma[] posteriorWeightPrecisions)
-		{
-			SetObservedVariables(numberOfActivities, featureValues);
+            this.featureValues.ObservedValue = featureValues;
+        }
 
-			this.activities.ObservedValue = labels;
+        public void Train(int numberOfActivities, double[][][] featureValues, int[][] labels,
+            out Gaussian[][][] posteriorWeights, out Gaussian[] posteriorWeightMeans, out Gamma[] posteriorWeightPrecisions)
+        {
+            SetObservedVariables(numberOfActivities, featureValues);
 
-			var priorWeightMeans = new Gaussian[numberOfActivities];
-			var priorWeightPrecisions = new Gamma[numberOfActivities];
-			for (int i = 0; i < numberOfActivities; i++)
-			{
-				priorWeightMeans[i] = new Gaussian(0, 1);
-				priorWeightPrecisions[i] = new Gamma(4, 0.5);
-			}
+            activities.ObservedValue = labels;
 
-			weightPriorMeans.ObservedValue = DistributionArrayHelpers.Copy(priorWeightMeans);
-			weightPriorPrecisions.ObservedValue = DistributionArrayHelpers.Copy(priorWeightPrecisions);
+            var priorWeightMeans = new Gaussian[numberOfActivities];
+            var priorWeightPrecisions = new Gamma[numberOfActivities];
+            for (int i = 0; i < numberOfActivities; i++)
+            {
+                priorWeightMeans[i] = new Gaussian(0, 1);
+                priorWeightPrecisions[i] = new Gamma(4, 0.5);
+            }
 
-			posteriorWeights = engine.Infer<Gaussian[][][]>(weights);
-			posteriorWeightMeans = engine.Infer<Gaussian[]>(weightMeans);
-			posteriorWeightPrecisions = engine.Infer<Gamma[]>(weightPrecisions);
-		}
+            weightPriorMeans.ObservedValue = DistributionArrayHelpers.Copy(priorWeightMeans);
+            weightPriorPrecisions.ObservedValue = DistributionArrayHelpers.Copy(priorWeightPrecisions);
 
-		public void Test(int numberOfActivities, double[][][] featureValues, Gaussian[] priorWeightMeans, Gamma[] priorWeightPrecisions, out Discrete[][] posteriorActivities)
-		{
-			SetObservedVariables(numberOfActivities, featureValues);
+            posteriorWeights = engine.Infer<Gaussian[][][]>(weights);
+            posteriorWeightMeans = engine.Infer<Gaussian[]>(weightMeans);
+            posteriorWeightPrecisions = engine.Infer<Gamma[]>(weightPrecisions);
+        }
 
-			weightPriorMeans.ObservedValue = DistributionArrayHelpers.Copy(priorWeightMeans);
-			weightPriorPrecisions.ObservedValue = DistributionArrayHelpers.Copy(priorWeightPrecisions);
+        public void Test(int numberOfActivities, double[][][] featureValues, Gaussian[] priorWeightMeans, Gamma[] priorWeightPrecisions, out Discrete[][] posteriorActivities)
+        {
+            SetObservedVariables(numberOfActivities, featureValues);
+
+            weightPriorMeans.ObservedValue = DistributionArrayHelpers.Copy(priorWeightMeans);
+            weightPriorPrecisions.ObservedValue = DistributionArrayHelpers.Copy(priorWeightPrecisions);
 
 
-			posteriorActivities = engine.Infer<Discrete[][]>(activities);
-		}
-	}
+            posteriorActivities = engine.Infer<Discrete[][]>(activities);
+        }
+    }
 }
 

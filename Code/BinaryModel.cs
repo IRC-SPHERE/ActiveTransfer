@@ -60,12 +60,11 @@ namespace ActiveTransfer
 #endif
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ActiveTransfer.BinaryModel"/> class.
+        /// Initializes a new instance of the <see cref="BinaryModel"/> class.
         /// </summary>
         /// <param name="trainModel">If set to <c>true</c> train model.</param>
         /// <param name="showFactorGraph">If set to <c>true</c> show factor graph.</param>
         /// <param name="debug">If set to <c>true</c> debug.</param>
-        /// <param name="useBias">If set to <c>true</c>, add a bias feature.</param>
         public BinaryModel(bool trainModel, bool showFactorGraph = false, bool debug = false)
         {
             evidence = Variable.Bernoulli(0.5).Named("evidence");
@@ -141,7 +140,7 @@ namespace ActiveTransfer
                 Algorithm = new ExpectationPropagation { DefaultNumberOfIterations = trainModel ? 10 : 1 },
                 ShowFactorGraph = showFactorGraph,
                 ShowProgress = false,
-				// BrowserMode = BrowserMode.Never, // debug ? BrowserMode.OnError : BrowserMode.Never,
+                // BrowserMode = BrowserMode.Never, // debug ? BrowserMode.OnError : BrowserMode.Never,
                 ShowWarnings = debug
             };
 
